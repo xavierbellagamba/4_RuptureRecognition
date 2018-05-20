@@ -149,6 +149,169 @@ def rotateCoordinate(pivot, coord, angle):
 	return new_coord
 
 
+#####################################################################################
+# rotateCoordinate: rotate the coordinate around chosen point
+#####################################################################################
+def translateCoordinate(translation, coord):
+	return [translation[0] + coord[0], translation[1] + coord[1]]
+
+
+#####################################################################################
+# getUniqueLabel : return a list of unique strings in an array
+#####################################################################################
+def getUniqueLabel(list_str):
+	unique_str = [list_str[0]]
+	for i in range(len(list_str)):
+		isDiff = True
+
+		for j in range(len(unique_str)):
+			if list_str[i] == unique_str[j]:
+				isDiff = False
+
+		if isDiff:
+			unique_str.append(list_str[i])
+
+	return unique_str
+
+
+#####################################################################################
+# countUniqueValue : return number of unique values
+#####################################################################################
+def countUniqueValues(list_x):
+	return len(getUniqueLabel(list_x))
+	
+
+#####################################################################################
+# findStationLocation: return a list of unique stations with locations (2 last elements are for grid location)
+#####################################################################################
+def findStationLocation(list_str, loc_x, loc_y):
+	n = countUniqueValues(list_str)
+	unique_station = [['', 0.0, 0.0, -1, -1] for i in range(n)]
+
+	unique_station[0][0] = list_str[0]
+	unique_station[0][1] = loc_x[0]
+	unique_station[0][2] = loc_y[0]
+
+	count = 1
+
+	for i in range(len(list_str)):
+		isDiff = True
+
+		for j in range(count):
+			if list_str[i] == unique_station[j][0]:
+				isDiff = False
+
+		if isDiff:
+			unique_station[count][0] = list_str[i]
+			unique_station[count][1] = loc_x[i]
+			unique_station[count][2] = loc_y[i]
+			count = count + 1
+
+	return unique_station
+
+
+#####################################################################################
+# getID: return a list of indices
+#####################################################################################
+def getID(label_str, label_list):
+	ID_list = []
+	for i in range(len(label_list)):
+		if label_str == label_list[i]:
+			ID_list.append(i)
+	return ID_list
+
+
+#####################################################################################
+# mapStations: transform station coordinates into grid location
+#####################################################################################
+def mapStations(data, cell_size):
+	for i in range(len(data)):
+		data[i][1] = int(data[i][1]/cell_size)
+		data[i][2] = int(data[i][2]/cell_size)
+
+	return data
+
+
+#####################################################################################
+# saveGMRecord: save GM record as csv
+#####################################################################################
+def saveGMRecord(data, label_str, grid_size, cell_size):
+	#Split label
+	label_elem = label_str.split('_')
+	
+	#Write label (name, hypocentre)
+	file_str = label_elem[0] + ',' + label_elem[1] + '\n'
+
+	#Write grid info (size and spacing)
+	file_str = file_str + str(grid_size[0]) + ',' + str(grid_size[1]) + ',' + str(cell_size)
+
+	#Write data
+	for i in range(len(data)):
+		file_str = file_str + '\n' + str(data[i][1]) + ',' + str(data[i][2]) + ',' + str(data[i][3]) + ',' + str(data[i][4]) + ',' + str(data[i][7])
+
+	#Export file
+	file_path = './gen/' + label_str + '.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
+
+
+#####################################################################################
+# importGMRecord: import GM record as a 3-layer grid
+#####################################################################################
+def importGMRecord(file_str):
+	rupture = []
+	hypo = []
+	data = []
+	grid_size = [-1, -1]
+	#Load the csv
+	with open(file_str) as csvfile:
+		readCSV = csv.reader(csvfile)
+
+		count = 0
+		for row in readCSV:
+			if count == 0:
+				rupture = row[0]
+				hypo = row[1]
+			elif count == 1:
+				grid_size[0] = int(float(row[0]))
+				grid_size[1] = int(float(row[1]))
+			else:
+				data_i = []
+				for i in range(len(row)):
+					if i < 2:
+						data_i.append(int(float(row[i])))
+					else:
+						data_i.append(float(row[i]))
+
+				data.append(data_i)
+
+			count = count + 1
+
+	csvfile.close()
+
+	#Create the grid
+	grid = np.zeros((grid_size[0], grid_size[1], 3))
+
+	#Populate the grid
+	for i in range(len(data)):
+		grid[data[i][0]][data[i][1]][0] = data[i][2]
+		grid[data[i][0]][data[i][1]][1] = data[i][3]
+		grid[data[i][0]][data[i][1]][2] = data[i][4]
+
+	return [grid, rupture, hypo]
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
