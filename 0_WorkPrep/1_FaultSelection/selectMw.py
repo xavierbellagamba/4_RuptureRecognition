@@ -3,6 +3,14 @@ import GMdataImportFx as gmx
 import matplotlib.pyplot as plt
 import csv
 
+###########################################
+# User-defined parameters
+###########################################
+#Min moment magnitude considered
+Mw_min = 6.8
+###########################################
+
+
 faultList = gmx.loadCSV('./faultList.csv')
 
 Mw = [x[1] for x in faultList]
@@ -41,7 +49,7 @@ plt.ylim([200, 500])
 
 selected_faults = []
 for i in range(len(Mw)):
-    if Mw[i] >= 6.8:
+    if Mw[i] >= Mw_min:
         selected_faults.append([faultList[i][0], Mw[i]])
         
 file_path = './selectedFault_list.csv'

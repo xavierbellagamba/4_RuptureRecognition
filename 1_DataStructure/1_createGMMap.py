@@ -4,9 +4,16 @@ import os
 import matplotlib.pyplot as plt
 import csv
 
+###########################################
+# User-defined parameters
+###########################################
+#Path to the main data file
+data_path = './data/DB_IM.csv'
+###########################################
+
 #Import data
 print('Load data...')
-data = gix.loadCSV('./data/DB_IM.csv', isInput=False, row_ignore=1, col_ignore=0)
+data = gix.loadCSV(data_path, isInput=False, row_ignore=1, col_ignore=0)
 
 #Convert station location
 print('Convert station coordinate system...')

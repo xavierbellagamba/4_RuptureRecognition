@@ -7,7 +7,10 @@ import discr_utils as du
 from matplotlib import cm
 from operator import add, sub
 
-#Selected IM
+###########################################
+# User-defined parameters
+###########################################
+#Selected IMs for the prediction
 IM_name = ['PGA', 'PGV']
 
 #Number of cross-validation folders
@@ -15,6 +18,7 @@ K = 5
 
 #Number of trees
 N_tree = np.arange(30, 61, 10)
+###########################################
 
 #Import data
 print('Load data...')

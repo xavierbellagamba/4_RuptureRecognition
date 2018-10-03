@@ -4,8 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-
+###########################################
+# User-defined parameters
+###########################################
+#Selected IMs
 IM_considered = ['PGA', 'PGV', 'pSA_0.1', 'pSA_1.0', 'pSA_3.0', 'Ds595', 'AI']
+###########################################
 
 #Import IM, station and label dict
 station_dict = gix.loadStationDict('station_dict.csv')
@@ -44,15 +48,7 @@ for i in range(len(data)):
 IM_val = np.asarray(IM_val)
 n_IM = len(IM_considered)
 IM_val = np.log(IM_val)
-'''
-#Compute dataset wide mean and std in log space
-mu_IM = np.mean(IM_val, axis=(1))
-std_IM = np.std(IM_val, axis=(1))
 
-#Save mu and std
-np.save('./mu_IM.npy', mu_IM)
-np.save('./std_IM.npy', std_IM)
-'''
 #Normalize IM
 print('Normalize the data...')
 data_n = []
