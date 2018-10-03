@@ -52,7 +52,7 @@ Considered number of faults:	116
 Min considered Mw considered:	6.8
 Considered number of ruptures: 	3424
 Initial different label number:	3424
-Available IMs:			PGA, PGV, Arias, CAV, Ds595, Ds575, MMI, Ds, 
+Available IMs:			PGA, PGV, Arias, CAV, Ds595, Ds575, MMI, 
 				pSA_[0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.75, 1.0, 2.0, 3.0, 4.0, 5.0, 7.5, 10.0]
 
 
