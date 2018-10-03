@@ -186,7 +186,7 @@ def countUniqueValues(list_x):
 #####################################################################################
 def findStationLocation(list_str, loc_x, loc_y):
 	n = countUniqueValues(list_str)
-	unique_station = [['', 0.0, 0.0] for i in range(n)]
+	unique_station = [['', 0.0, 0.0, -1, -1] for i in range(n)]
 
 	unique_station[0][0] = list_str[0]
 	unique_station[0][1] = loc_x[0]
@@ -310,7 +310,7 @@ def saveStationDict(station):
 
 	#Create station file
 	for i in range(len(station)):
-		file_str = file_str + station[i][0] + ',' + str(station[i][1]) + ',' + str(station[i][2])
+		file_str = file_str + station[i][0] + ',' + str(station[i][3]) + ',' + str(station[i][4])
 		if i != len(station)-1:
 			file_str = file_str + '\n'
 
@@ -360,42 +360,7 @@ def createGMRecord(data, label_str, grid_size):
 	return GMmap, label
 
 
-#####################################################################################
-# saveIMDict: save station dictionary as csv
-#####################################################################################
-def saveIMDict(label):
-	file_str = ''
-	key = list(label.keys())
 
-	#Create station file
-	for i in range(len(label)):
-		file_str = file_str + key[i] + ',' + str(label[key[i]])
-		if i != len(label)-1:
-			file_str = file_str + '\n'
-
-	#Export file
-	file_path = './IM_dict.csv'
-	with open(file_path, "w") as output_file:
-		print(file_str, file=output_file)
-	output_file.close()
-
-
-#####################################################################################
-# loadIMDict: load station dictionary
-#####################################################################################
-def loadIMDict(file_path, reverse=False):
-	#Load data
-	raw_data = loadCSV(file_path)
-
-	#Create dict
-	label_dict = {}
-	for i in range(len(raw_data)):
-		label_dict.update({raw_data[i][0] : int(raw_data[i][1])})
-
-	if reverse:
-		label_dict = {v: k for k, v in label_dict.items()}
-
-	return label_dict
 
 
 
