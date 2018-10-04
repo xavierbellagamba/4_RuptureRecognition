@@ -6,18 +6,22 @@ import GMCluster as gml
 import discr_utils as du
 from matplotlib import cm
 from operator import add, sub
+import pickle
 
 ###########################################
 # User-defined parameters
 ###########################################
 #Selected IMs for the prediction
-IM_name = ['PGA', 'PGV']
+IM_name = ['PGV']
 
 #Number of cross-validation folders
 K = 5
 
 #Number of trees
-N_tree = np.arange(30, 61, 10)
+N_tree = np.arange(30, 41, 10)
+
+#Model name
+model_name = 'RF_disriminator.mdl'
 ###########################################
 
 #Import data
@@ -39,6 +43,10 @@ if not os.path.exists(dir_path):
 	os.mkdir(dir_path)
 
 #CV framework
+bestModel = []
+lowestError = 100000.0
+N_tree_best = 0
+IM_best = ''
 print('Start the ' + str(K) + '-Fold crossvalidation...')
 CV_err_mean = [[] for i in range(len(IM_name))]
 CV_err_std = [[] for i in range(len(IM_name))]
@@ -70,26 +78,37 @@ for i_IM in  range(len(IM_name)):
             accuracy = 100.*float(accuracy_count)/float(len(y_val))
             print('\t Validation accuracy = ' + str(accuracy) + '%')
             CV_err_i.append(1.0-accuracy/100.)
+            if CV_err_i[-1] < lowestError:
+                lowestError = CV_err_i[-1]
+                bestModel = RF
+                IM_best = IM_name[i_IM]
+                N_tree_best = N_tree[i_tree]
 
         #Estimate CV error for N_tree_i and IM_i
         CV_err_mean[i_IM].append(np.mean(CV_err_i))
         CV_err_std[i_IM].append(np.std(CV_err_i))
 
-#Plot results
+#Plot results        
 IM_ID_norm = [x/len(IM_ID) for x in IM_ID]
 cm_IM = cm.get_cmap('winter')
 IM_col = cm_IM([IM_ID_norm])
-plt.figure()
+fig, ax = plt.subplots()
 for i in range(len(IM_name)):
-    plt.scatter(N_tree, CV_err_mean[i], label=IM_name[i], color=IM_col[0, i, :])
-    plt.scatter(N_tree, list(map(add, CV_err_mean[i], CV_err_std[i])), marker='_', color=IM_col[0, i, :])
-    plt.scatter(N_tree, list(map(sub, CV_err_mean[i], CV_err_std[i])), marker='_', color=IM_col[0, i, :])
-plt.grid()
-plt.legend()
-plt.xlabel('Number of random trees')
-plt.ylabel('Cross-validation error (inaccuracy)')
+    ax.scatter(N_tree, CV_err_mean[i], label=IM_name[i], color=IM_col[0, i, :])
+    ax.scatter(N_tree, list(map(add, CV_err_mean[i], CV_err_std[i])), marker='_', color=IM_col[0, i, :])
+    ax.scatter(N_tree, list(map(sub, CV_err_mean[i], CV_err_std[i])), marker='_', color=IM_col[0, i, :])
+ax.scatter(N_tree_best, lowestError, s=60, marker='d', color='black', label='Best model (' + IM_best + ')')
+ax.grid()
+ax.set_axisbelow(True)
+ax.legend()
+ax.set_xlabel('Number of random trees')
+ax.set_ylabel('Cross-validation error (inaccuracy)')
+plt.tight_layout()
+plt.savefig(dir_path + 'CV_RF.pdf', dpi=600)
 
-
+#Save the model
+model_path = dir_path + model_name
+pickle.dump(bestModel, open(model_path, 'wb'))
 
 
 
