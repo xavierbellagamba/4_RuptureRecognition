@@ -86,6 +86,8 @@ for i in range(len(IM_considered)):
 
 gcl.saveIMDict_trainData(IM_dict_train)
     
+#Save real station ID
+gcl.saveRealStationID(station_dict)
     
     
     

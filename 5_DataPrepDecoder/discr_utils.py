@@ -1,6 +1,5 @@
 import numpy as np
 import csv
-import prepDx as pdx
 
 
 #####################################################################################
@@ -71,19 +70,11 @@ def createTrainValDataset(X, y, ind_K, k, i_IM):
 	return X_train, y_train, X_val, y_val
 
 
-#####################################################################################
-# loadGM_1D: load a ground motion composed of recorded IM from real stations
-#####################################################################################
-def loadGM_1D(str_rupt, realID, IM_ID):
-	#Load GM
-	GM = pdx.loadGM_CS(str_rupt)
 
-	#Populate matrix
-	GM_prep = np.ones((len(realID))) * (-8.0)
-	for i in range(len(GM)):
-		GM_prep[int(realID[GM[i][0]])] = np.log(GM[i][IM_ID])
 
-	return GM_prep
+
+
+
 
 
 

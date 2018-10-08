@@ -166,7 +166,42 @@ def loadIMDict_trainData(file_path, reverse=False):
 	return label_dict
 
 
+#####################################################################################
+# saveRealStationID: save the ID real stations in the form of a dictionary
+#####################################################################################
+def saveRealStationID(label):
+	file_str = ''
+	key = list(label.keys())
 
+	#Create station file
+	for i in range(len(label)):
+		file_str = file_str + key[i] + ',' + str(label[key[i]])
+		if i != len(label)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './realStationID.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
+
+
+#####################################################################################
+# loadRealStationID: load the ID real stations in the form of a dictionary
+#####################################################################################
+def loadRealStationID(file_path, reverse=False):
+	#Load data
+	raw_data = gix.loadCSV(file_path)
+
+	#Create dict
+	label_dict = {}
+	for i in range(len(raw_data)):
+		label_dict.update({raw_data[i][0] : raw_data[i][1]})
+
+	if reverse:
+		label_dict = {v: k for k, v in label_dict.items()}
+
+	return label_dict
 
 
 

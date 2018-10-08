@@ -12,13 +12,13 @@ import pickle
 # User-defined parameters
 ###########################################
 #Selected IMs for the prediction
-IM_name = ['PGV']
+IM_name = ['PGV', 'PGA', 'AI', 'pSA0.1', 'pSA1.0', 'pSA3.0']
 
 #Number of cross-validation folders
 K = 5
 
 #Number of trees
-N_tree = np.arange(30, 41, 10)
+N_tree = np.arange(50, 1000, 25)
 
 #Model name
 model_name = 'RF_disriminator.mdl'

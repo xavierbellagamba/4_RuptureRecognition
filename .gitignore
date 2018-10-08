@@ -1,3 +1,6 @@
+*.spydata
+*.json
+*.hdf5
 *.mdl
 *.zip
 *.png
