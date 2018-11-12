@@ -1,5 +1,7 @@
 import numpy as np
 import csv
+import prepDx as pdx
+import GMdataImportFx as gix
 
 
 #####################################################################################
@@ -70,25 +72,114 @@ def createTrainValDataset(X, y, ind_K, k, i_IM):
 	return X_train, y_train, X_val, y_val
 
 
+#####################################################################################
+# loadGM_1D: load a ground motion composed of recorded IM from real stations
+#####################################################################################
+def loadGM_1D(str_rupt, realID, IM_ID):
+	#Load GM
+	GM = pdx.loadGM_CS(str_rupt)
+
+	#Populate matrix
+	GM_prep = np.ones((len(realID))) * (-8.0)
+	for i in range(len(GM)):
+		GM_prep[int(realID[GM[i][0]])] = np.log(GM[i][IM_ID])
+
+	return GM_prep
+
+
+#####################################################################################
+# saveFaultDict: save fault dictionary used by the RF
+#####################################################################################
+def saveFaultDict(fault_dict):
+	file_str = ''
+	name = list(fault_dict.keys())
+	ind = list(fault_dict.values())
+
+	#Create station file
+	for i in range(len(fault_dict)):
+		file_str = file_str + name[i]
+		for j in range(len(ind[i])):
+			file_str = file_str + ',' + str(ind[i][j])
+		if i != len(fault_dict)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './fault_dict.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
+
+
+#####################################################################################
+# loadFaultDict: load fault dictionary
+#####################################################################################
+def loadFaultDict(file_path, reverse=False):
+	#Load data
+	raw_data = gix.loadCSV(file_path, row_ignore=0, col_ignore=0, isInput=False, isCategorical=False)
+
+	#Create dict
+	fault_dict = {}
+	for i in range(len(raw_data)):
+		fault_dict.update({raw_data[i][0] : [int(x) for x in raw_data[i][1:]]})
+
+	if reverse:
+		fault_dict = {v: k for k, v in fault_dict.items()}
+
+	return fault_dict
 
 
 
+#####################################################################################
+# saveRuptureDict: save rupture dict
+#####################################################################################
+def saveRuptureDict(rupt_dict):
+	file_str = ''
+	key = list(rupt_dict.keys())
+
+	#Create station file
+	for i in range(len(rupt_dict)):
+		file_str = file_str + key[i] + ',' + str(rupt_dict[key[i]])
+		if i != len(rupt_dict)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './rupture_dict.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
 
 
+#####################################################################################
+# loadRuptureDict: load rupture dict
+#####################################################################################
+def loadRuptureDict(file_path, reverse=False):
+	#Load data
+	raw_data = gix.loadCSV(file_path)
+
+	#Create dict
+	rupt_dict = {}
+	for i in range(len(raw_data)):
+		rupt_dict.update({raw_data[i][0] : int(raw_data[i][1])})
+
+	if reverse:
+		rupt_dict = {v: k for k, v in rupt_dict.items()}
+
+	return rupt_dict
 
 
+#####################################################################################
+# createTestDataset: create the test dataset folders based on K-fold structure and index
+#####################################################################################
+def createTestDataset(X, y, ind_K, k):
+	X_test = []
+	y_test = []
 
+	for i in range(len(ind_K)):
+		if ind_K[i] == k:
+			X_test.append(X[i, :, :])
+			y_test.append(y[i])
 
-
-
-
-
-
-
-
-
-
-
+	return X_test, y_test
 
 
 

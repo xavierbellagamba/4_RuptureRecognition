@@ -17,6 +17,9 @@ cell_size = 20000. #meters
 station = pdx.loadVirtStationDict('virt_station_dict.csv')
 data = np.asarray(list(station.values()))
 
+#Load GM list for testing
+GM_test_lbl = gix.loadCSV('./GM_test.csv')
+
 #Rotate locations
 #Christchurch cathedral
 translation = [-1200000., -4570000.]
@@ -71,7 +74,7 @@ for i in range(len(lbl_IM)):
 
 #Treat map one after another (memory efficiency)
 unfoundStation = []
-for i in range(1):#n_file):
+for i in range(n_file):
     GM_i = pdx.loadGM_CS(file_name[i])
     for j in range(1, len(GM_i)):
         for k in range(len(IM_pos)):
@@ -82,6 +85,16 @@ for i in range(1):#n_file):
 
     GM_name.append(file_name[i][7:-4])
     GM_lbl.append(lbl_dict[file_name[i][7:-4]])
+
+#Split data between training and testing
+ind_train = []
+ind_test = []
+for i in range(n_file):
+    for j in range(len(GM_test_lbl)):
+        if GM_test_lbl[j][0] == file_name[i][7:-4]:
+            ind_test.append(i)
+        else:
+            ind_train.append(i)
     
 #Folder and file names
 dir_path = './gen/'
@@ -89,11 +102,12 @@ if not os.path.exists(dir_path):
 	os.mkdir(dir_path)
     
 #Save results
-np.save(dir_path + 'X.npy', GM)
-np.save(dir_path + 'y.npy', np.asarray(GM_lbl))
-np.save(dir_path + 'X_name.npy', np.asarray(GM_name))
+np.save(dir_path + 'X_test.npy', GM[ind_test])
+np.save(dir_path + 'y_test.npy', np.asarray(GM_lbl)[ind_test])
+np.save(dir_path + 'X_name_test.npy', np.asarray(GM_name)[ind_test])
+np.save(dir_path + 'X_train.npy', GM[ind_train])
+np.save(dir_path + 'y_train.npy', np.asarray(GM_lbl)[ind_train])
+np.save(dir_path + 'X_name_train.npy', np.asarray(GM_name)[ind_train])
 
 
-st = np.asarray(list(station_rot_dict2.values()))
-plt.scatter(st[:, 0], st[:, 1])
 

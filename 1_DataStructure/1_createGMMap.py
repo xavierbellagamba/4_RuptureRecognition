@@ -66,10 +66,10 @@ for i in range(len(label_u)):
     
 #Save dictionnary of stations
 gix.saveStationDict(station)
-    
+
 #Create IM dictionary
 IM_dict = {}
-data = gix.loadCSV('./data/DB_test.csv', isInput=False, row_ignore=0, col_ignore=0)
+data = gix.loadCSV('./data/DB_IM.csv', isInput=False, row_ignore=0, col_ignore=0)
 data = data[0][4:-1]
 for i in range(len(data)):
     IM_dict[data[i]] = i

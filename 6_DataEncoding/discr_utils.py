@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 import prepDx as pdx
+import GMdataImportFx as gix
 
 
 #####################################################################################
@@ -86,15 +87,138 @@ def loadGM_1D(str_rupt, realID, IM_ID):
 	return GM_prep
 
 
+#####################################################################################
+# saveFaultDict: save fault dictionary used by the RF
+#####################################################################################
+def saveFaultDict(fault_dict):
+	file_str = ''
+	name = list(fault_dict.keys())
+	ind = list(fault_dict.values())
+
+	#Create station file
+	for i in range(len(fault_dict)):
+		file_str = file_str + name[i]
+		for j in range(len(ind[i])):
+			file_str = file_str + ',' + str(ind[i][j])
+		if i != len(fault_dict)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './fault_dict.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
+
+
+#####################################################################################
+# loadFaultDict: load fault dictionary
+#####################################################################################
+def loadFaultDict(file_path, reverse=False):
+	#Load data
+	raw_data = gix.loadCSV(file_path, row_ignore=0, col_ignore=0, isInput=False, isCategorical=False)
+
+	#Create dict
+	fault_dict = {}
+	for i in range(len(raw_data)):
+		fault_dict.update({raw_data[i][0] : [int(x) for x in raw_data[i][1:]]})
+
+	if reverse:
+		fault_dict = {v: k for k, v in fault_dict.items()}
+
+	return fault_dict
 
 
 
+#####################################################################################
+# saveRuptureDict: save rupture dict
+#####################################################################################
+def saveRuptureDict(rupt_dict):
+	file_str = ''
+	key = list(rupt_dict.keys())
+
+	#Create station file
+	for i in range(len(rupt_dict)):
+		file_str = file_str + key[i] + ',' + str(rupt_dict[key[i]])
+		if i != len(rupt_dict)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './rupture_dict.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
 
 
+#####################################################################################
+# loadRuptureDict: load rupture dict
+#####################################################################################
+def loadRuptureDict(file_path, reverse=False):
+	#Load data
+	raw_data = gix.loadCSV(file_path)
+
+	#Create dict
+	rupt_dict = {}
+	for i in range(len(raw_data)):
+		rupt_dict.update({raw_data[i][0] : int(raw_data[i][1])})
+
+	if reverse:
+		rupt_dict = {v: k for k, v in rupt_dict.items()}
+
+	return rupt_dict
 
 
+#####################################################################################
+# createTestDataset: create the test dataset folders based on K-fold structure and index
+#####################################################################################
+def createTestDataset(X, y, ind_K, k):
+	X_test = []
+	y_test = []
+
+	for i in range(len(ind_K)):
+		if ind_K[i] == k:
+			X_test.append(X[i, :, :])
+			y_test.append(y[i])
+
+	return X_test, y_test
 
 
+#####################################################################################
+# createTrainDataset: create the train dataset folders based on K-fold structure and index
+#####################################################################################
+def createTrainDataset(X, y, ind_K, k):
+	X_train = []
+	y_train = []
+
+	for i in range(len(ind_K)):
+		if not ind_K[i] == k:
+			X_train.append(X[i, :, :])
+			y_train.append(y[i])
+
+	return X_train, y_train
+
+
+#####################################################################################
+# saveTestGMLabel: save the GM label that are selected for testing
+#####################################################################################
+def saveTestGMLabel(ind_K, k, GM_lbl):
+	GM_select = []
+
+	for i in range(len(ind_K)):
+		if ind_K[i] == k:
+			GM_select.append(GM_lbl[i])
+
+	file_str = ''
+	#Create station file
+	for i in range(len(GM_select)):
+		file_str = file_str + GM_select[i]
+		if i != len(GM_select)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './GM_test.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
 
 
 

@@ -46,12 +46,18 @@ for i in range(len(GM_name)):
 
 #Save P
 P = np.asarray(P)
-P = P.reshape((len(GM_name), 20, 10))
+'''
+P_final = np.zeros((len(GM_name), 5, 11, P.shape[2]))
+for i in range(len(GM_name)):
+    for j in range(5):
+        for k in range(11):
+            P_final[i, j, k, :] = P[i, 0]
+'''
 dir_path = './gen/'
 if not os.path.exists(dir_path):
 	os.mkdir(dir_path)
-    
-np.save('./gen/P_X.npy', P)
+P_final = P
+np.save('./gen/P_X.npy', P_final)
 
 
 
