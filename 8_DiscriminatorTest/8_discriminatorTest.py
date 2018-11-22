@@ -25,16 +25,16 @@ model_name = 'RF_discriminator.mdl'
 IM_name = ['AI']
 
 #Dropout rate
-drop_rate = [0.025, 0.05]#, 0.1]#, 0.15, 0.2, 0.25, 0.3]
+drop_rate = [0.025, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
 
 #Number of tests per rupture
-n = 5
+n = 100
 ###########################################
 
 #Import data
 print('Load data...')
-X = np.load('./data/X_test_BT.npy')
-y = np.load('./data/y_test_BT.npy')
+X = np.load('./data/X_test.npy')
+y = np.load('./data/y_test.npy')
 lbl_GM = gml.loadLabelDict('label_dict.csv', reverse=True)
 lbl_GM = list(lbl_GM.keys())
 IM_dict = gml.loadIMDict_trainData('IM_dict_train.csv')

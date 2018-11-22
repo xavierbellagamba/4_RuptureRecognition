@@ -32,7 +32,7 @@ IM_name = ['PGA', 'PGV', 'AI', 'pSA_0.1', 'pSA_1.0', 'pSA_3.0']
 K = 5
 
 #Number of trees
-N_estimator = np.arange(25, 2001, 25)
+N_estimator = np.arange(100, 2001, 200)
 
 #Model name
 model_name = 'discriminator.mdl'
@@ -187,7 +187,19 @@ if rank == rootRank:
     accuracy = 100.*float(accuracy_count)/float(len(y_test))
     error_test = 1.0-accuracy/100.
     
+    #Save results
+    np.save(dir_path + 'lr.npy', np.array(learning_rate))
+    np.save(dir_path + 'im_name.npy', np.array(IM_name))
+    np.save(dir_path + 'N_est.npy', N_estimator)
+    np.save(dir_path + 'CV_mean.npy', np.array(CV_err_mean))
+    np.save(dir_path + 'CV_std.npy', np.array(CV_err_std))
+    np.save(dir_path + 'lr_best.npy', np.array(lr_best))
+    np.save(dir_path + 'N_best.npy', np.array(N_best))
+    np.save(dir_path + 'im_best.npy', np.array(IM_best))
+    
+    
     #Plot the results
+    '''
     IM_ID_norm = [x/len(IM_ID) for x in IM_ID]
     cm_IM = cm.get_cmap('tab10')
     IM_col = cm_IM([IM_ID_norm])
@@ -210,6 +222,7 @@ if rank == rootRank:
         ax.set_xlabel('Number of random trees')
         ax.set_ylabel('Cross-validation error (inaccuracy)')
         plt.savefig(dir_path + 'CV_BT_' + str(i_lr) + '.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
+    '''
 
     #Save the model
     model_path = dir_path + model_name

@@ -90,11 +90,14 @@ for i in range(n_file):
 ind_train = []
 ind_test = []
 for i in range(n_file):
+    isNotTest = 1
     for j in range(len(GM_test_lbl)):
         if GM_test_lbl[j][0] == file_name[i][7:-4]:
             ind_test.append(i)
-        else:
-            ind_train.append(i)
+            isNotTest = 0
+            break
+    if isNotTest == 1:
+        ind_train.append(i)
     
 #Folder and file names
 dir_path = './gen/'

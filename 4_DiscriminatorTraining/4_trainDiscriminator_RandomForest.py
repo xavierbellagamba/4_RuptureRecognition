@@ -127,6 +127,7 @@ accuracy_best = 100.*float(accuracy_count)/float(len(y_test))
 
 #Plot results
 print('Plot training history and save model...')      
+'''
 IM_ID_norm = [x/len(IM_ID) for x in IM_ID]
 cm_IM = cm.get_cmap('tab10')
 IM_col = cm_IM([IM_ID_norm])
@@ -155,6 +156,15 @@ ax.set_xlabel('Number of random trees')
 ax.set_ylabel('Cross-validation error (inaccuracy)')
 #plt.tight_layout()
 plt.savefig(dir_path + 'CV_RF.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
+'''
+
+#Save results
+np.save(dir_path + 'im_name.npy', np.array(IM_name))
+np.save(dir_path + 'N_est.npy', N_tree)
+np.save(dir_path + 'CV_mean.npy', np.array(CV_err_mean))
+np.save(dir_path + 'CV_std.npy', np.array(CV_err_std))
+np.save(dir_path + 'N_best.npy', np.array(N_tree_best))
+np.save(dir_path + 'im_best.npy', np.array(IM_best))
 
 #Save the model
 model_path = dir_path + model_name
