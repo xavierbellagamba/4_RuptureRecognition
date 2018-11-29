@@ -1,8 +1,14 @@
 import numpy as np
 import csv
+from sklearn.ensemble import RandomForestClassifier
 import os
 from operator import itemgetter
 import GMdataImportFx as gix
+import keras as k
+import gene_utils as gu
+import GMdataImportFx as gmc
+import GMCluster as gml
+import discr_utils as du
 
 
 #####################################################################################
@@ -95,6 +101,65 @@ def saveGeneratorResults(GM_map, data_name, IM_name):
 			writer = csv.writer(f)
 			writer.writerows(GM_raster)
 		f.close()
+
+
+#####################################################################################
+#evaluateEvent: evaluate the event and produce GM map
+#####################################################################################
+def evaluateEvent(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name):
+	#Create result folder
+	dir_path = './gen/' + data_name
+	if not os.path.exists(dir_path):
+		os.mkdir(dir_path)
+
+	#Create the IM array for discriminator
+	GM = du.loadGM_1D('./data/' + data_name + '.csv', realID, 1)
+	GM = GM.reshape(1, -1)
+
+	#Get discriminator results
+	print('Predict fault and rupture probabilities...\n')
+	#Rupture 
+	P_rupture = discriminator_GM.predict_proba(GM)[0]
+	rupture_hat = discriminator_GM.predict(GM)
+
+	#Fault
+	P_fault = getFaultProba(P_rupture, fault_dict)
+	fault_hat = predictFault(P_fault, fault_dict)
+	print('Most probable fault: \t' + fault_hat)
+	print('Most probable rupture: \t' + rupture_hat[0])
+
+	#Export discriminator results
+	print('\nSave discriminator results...')
+	saveDiscriminatorResults(P_rupture, P_fault, rupture_dict, fault_dict, data_name)
+
+	#Get results from generator
+	print('Generate GM map...')
+	P_rupture = P_rupture.reshape(1, 1, 1, -1)
+	GM_pred = generator_GM.predict(P_rupture)
+
+	#Export generator results
+	print('Save generator results...')
+	saveGeneratorResults(GM_pred[0], data_name, IM_name)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
