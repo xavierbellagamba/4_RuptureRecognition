@@ -25,29 +25,31 @@ model_name = 'RF_discriminator.mdl'
 IM_name = ['AI']
 
 #Dropout rate
-drop_rate = [0.025, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
+drop_rate = [0.025]#, 0.05, 0.075, 0.1, 0.125]
 
 #Number of tests per rupture
-n = 100
+n = 1
 ###########################################
 
 #Import data
 print('Load data...')
 X = np.load('./data/X_test.npy')
 y = np.load('./data/y_test.npy')
-lbl_GM = gml.loadLabelDict('label_dict.csv', reverse=True)
-lbl_GM = list(lbl_GM.keys())
 IM_dict = gml.loadIMDict_trainData('IM_dict_train.csv')
 IM_ID = [int(IM_dict[x]) for x in IM_name]
 rupt_dict = {}
-for i in range(len(lbl_GM)):
-    rupt_dict[lbl_GM[i]] = i
+
 
 #Load discriminator
+print('Load discriminator...')
 rf_load = open('./Discriminator/' + model_name, 'rb')
 discr = pickle.load(rf_load)
+lbl_GM = discr.classes_
+for i in range(len(lbl_GM)):
+    rupt_dict[str(lbl_GM[i])] = i
 
 #Without dropout rate
+print('Evaluate accuracy without dropout...')
 p_pred = np.zeros((X.shape[0]))
 x_pred = np.zeros((X.shape[0]))
 for i in range(X.shape[0]):
@@ -58,7 +60,6 @@ for i in range(X.shape[0]):
     
 acc_full_mu = np.mean(p_pred)
 pred_mu = np.sum(x_pred)/float(X.shape[0])
-
 
 #%%
 #Dropout rate
@@ -71,6 +72,7 @@ p_dropout_mu = np.zeros((len(drop_rate)))
 
 #For each dropout
 for i in range(len(drop_rate)):
+    print('Evaluate accuracy with dropout ' + str(drop_rate[i]) + '...')
     #For each existing rupture, test the dropout
     for j in range(X.shape[0]): 
         #Create list of indices to drop
@@ -80,7 +82,7 @@ for i in range(len(drop_rate)):
         ind_2null = np.random.choice(ind_nonnull, (n, n_2null))
         
         for k in range(n):
-            data_t = data
+            data_t = np.copy(data)
             data_t[0, ind_2null[k]] = -8.0
             
             pred = discr.predict(data_t)
@@ -98,6 +100,7 @@ for i in range(len(drop_rate)):
     p_dropout_mu[i] = np.mean(p_rupt[i, :])
             
 #%%
+print('Plot results...')
 rc('text', usetex=True)
 rc('font', family='serif')
 #Plot results dropout dropout
@@ -146,6 +149,7 @@ ax.set_xticks([0.0, 0.025, 0.05, 0.075, 0.1, 0.125])
 ax.grid()
 ax.set_axisbelow(True)
 #plt.tight_layout()
+plt.savefig('rupture_Test.pdf', dpi=600)
 
 
 

@@ -32,13 +32,13 @@ IM_name = ['PGA', 'PGV', 'AI', 'pSA_0.1', 'pSA_1.0', 'pSA_3.0']
 K = 5
 
 #Number of trees
-N_estimator = np.arange(100, 2001, 200)
+N_estimator = [300]
 
 #Model name
 model_name = 'discriminator.mdl'
 
 #Tested features max
-learning_rate = [0.01, 0.05, 0.001]
+learning_rate = [0.1, 0.05, 0.01, 0.05, 0.001]
 ###########################################
 
 
@@ -173,7 +173,7 @@ if rank == rootRank:
     X_test = X_test[:, :, int(IM_dict[IM_best])]
     
     #Create and fit the model
-    bestModel = GradientBoostingClassifier(learning_rate=lr_best, n_estimators=N_best, min_samples_split=2, max_depth=7, max_features=None, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
+    bestModel = GradientBoostingClassifier(learning_rate=lr_best, n_estimators=N_best, min_samples_split=2, max_depth=3, max_features=2, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
     bestModel = bestModel.fit(X, y)
         
     #Test on validation set
@@ -196,37 +196,40 @@ if rank == rootRank:
     np.save(dir_path + 'lr_best.npy', np.array(lr_best))
     np.save(dir_path + 'N_best.npy', np.array(N_best))
     np.save(dir_path + 'im_best.npy', np.array(IM_best))
+    np.save(dir_path + 'error_test.npy', np.array(error_test))
     
     
     #Plot the results
-    '''
     IM_ID_norm = [x/len(IM_ID) for x in IM_ID]
     cm_IM = cm.get_cmap('tab10')
     IM_col = cm_IM([IM_ID_norm])
+    '''
+    CV_err_mean = np.asarray(CV_err_mean)
+    CV_err_std = np.asarray(CV_err_std)
 
     rc('text', usetex=True)
     rc('font', family='serif', size=13)
 
-    for i_lr in range(len(learning_rate)):
-        fig, ax = plt.subplots()
-        fig.set_size_inches(cm2inch(16), cm2inch(11))
-        for i_IM in range(len(IM_name)):
-            lbl_str = IM_name[i_IM]# + ', ' + str(learning_rate[i_lr])
-            ax.plot(N_estimator, CV_err_mean[i_lr][i_IM], label=lbl_str, color=IM_col[0, i_IM, :])
-            ax.fill_between(N_estimator, list(map(add, CV_err_mean[i_lr][i_IM], CV_err_std[i_lr][i_IM])), list(map(sub, CV_err_mean[i_lr][i_IM], CV_err_std[i_lr][i_IM])),  color=IM_col[0, i_IM, :], alpha=0.3)
-        if learning_rate[i_lr] == lr_best:
-            ax.scatter(N_best, error_test, s=60, marker='d', color='black', label='Selected model (' + IM_best + ')')
-        ax.grid()
-        ax.set_axisbelow(True)
-        lgd = ax.legend(bbox_to_anchor=(1.02, 1), loc=2, ncol=1, borderaxespad=0., fontsize=11)
-        ax.set_xlabel('Number of random trees')
-        ax.set_ylabel('Cross-validation error (inaccuracy)')
-        plt.savefig(dir_path + 'CV_BT_' + str(i_lr) + '.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
-    '''
+    fig, ax = plt.subplots()
+    fig.set_size_inches(cm2inch(16), cm2inch(11))
+    for i_IM in range(len(IM_name)):
+        lbl_str = IM_name[i_IM]# + ', ' + str(learning_rate[i_lr])
+        ax.plot(learning_rate, CV_err_mean[:, i_IM, :], label=lbl_str, color=IM_col[0, i_IM, :])
+        ax.fill_between(learning_rate, np.squeeze(CV_err_mean[:, i_IM] + CV_err_std[:, i_IM]), np.squeeze(CV_err_mean[:, i_IM] - CV_err_std[:, i_IM]),  color=IM_col[0, i_IM, :], alpha=0.3)
+    ax.scatter(lr_best, error_test, s=60, marker='d', color='black', label='Selected model (' + IM_best + ')')
+    ax.grid()
+    ax.set_axisbelow(True)
+    ax.set_xscale('log')
+    ax.set_xlim([max(learning_rate), min(learning_rate)])
+    lgd = ax.legend(bbox_to_anchor=(1.02, 1), loc=2, ncol=1, borderaxespad=0., fontsize=11)
+    ax.set_xlabel('Learning rate')
+    ax.set_ylabel('Cross-validation error (inaccuracy)')
+    plt.savefig(dir_path + 'CV_BT_' + str(i_lr) + '.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
     #Save the model
     model_path = dir_path + model_name
     pickle.dump(bestModel, open(model_path, 'wb'))
+    '''
 
 
 #######################################################
@@ -243,7 +246,7 @@ else:
         X_train, y_train, X_val, y_val = du.createTrainValDataset(X, y, ind_K, job_i[3], IM_ID[job_i[1]])
 
         #Create and fit the model
-        BT = GradientBoostingClassifier(learning_rate=learning_rate[job_i[0]], n_estimators=N_estimator[job_i[2]], min_samples_split=2, max_depth=7, max_features=None, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
+        BT = GradientBoostingClassifier(learning_rate=learning_rate[job_i[0]], n_estimators=N_estimator[job_i[2]], min_samples_split=2, max_depth=3, max_features=2, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
         BT = BT.fit(X_train, y_train)
         
         #Test on validation set

@@ -59,6 +59,7 @@ y = np.load('./data/y_train.npy')
 #RF = pickle.load(open(dir_path + 'discriminator.mdl', 'rb'))
 
 #Compute accuracy best
+IM_best = np.array('AI')
 X = X[:, :, int(IM_dict[str(IM_best)])]
 X_test = X_test[:, :, int(IM_dict[str(IM_best)])]
 
@@ -81,6 +82,7 @@ print('Plot training history and save model...')
 IM_ID_norm = [x/len(IM_ID) for x in IM_ID]
 cm_IM = cm.get_cmap('tab10')
 IM_col = cm_IM([IM_ID_norm])
+IM_name = ['PGA', 'PGV', 'AI', 'pSA(0.1s)', 'pSA(1.0s)', 'pSA(3.0s)' ]
 
 rc('text', usetex=True)
 rc('font', family='serif', size=13)

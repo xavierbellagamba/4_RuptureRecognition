@@ -24,7 +24,7 @@ IM_name = ['PGA', 'PGV', 'AI', 'pSA_0.1', 'pSA_1.0', 'pSA_3.0']
 K = 5
 
 #Number of trees
-N_tree = np.arange(25, 2001, 25)
+N_tree = np.arange(50, 2001, 50)
 
 #Model name
 model_name = 'discriminator.mdl'

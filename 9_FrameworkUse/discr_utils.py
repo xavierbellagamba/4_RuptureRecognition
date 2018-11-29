@@ -82,6 +82,8 @@ def loadGM_1D(str_rupt, realID, IM_ID):
 	#Populate matrix
 	GM_prep = np.ones((len(realID))) * (-8.0)
 	for i in range(len(GM)):
+		if i < 15:
+			print(GM[i][0] + '    ' + str(int(realID[GM[i][0]])) + '     ' + str(GM[i][IM_ID]) + '     ' + str(np.log(GM[i][IM_ID])))
 		GM_prep[int(realID[GM[i][0]])] = np.log(GM[i][IM_ID])
 
 	return GM_prep

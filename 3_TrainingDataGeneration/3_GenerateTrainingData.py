@@ -73,7 +73,7 @@ IM_final = np.ones((n_rupture, n_station, n_IM))*(-8.0)
 print('Save data...')
 for i in range(n_rupture):
     for j in range(len(data[i])):
-        IM_final[i, j, :] = data_n[i][j][:]
+        IM_final[i, station_dict[data[i][j][0]], :] = data_n[i][j][:]
     
 #Transform labels
 for i in range(n_rupture):

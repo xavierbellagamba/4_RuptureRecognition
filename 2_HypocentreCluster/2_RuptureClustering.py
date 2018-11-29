@@ -117,4 +117,3 @@ for i in range(len(fault)):
 
 #Save the new label dictionary
 gcl.saveLabelDict(dict_GM)
-
