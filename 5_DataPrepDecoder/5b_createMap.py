@@ -40,6 +40,7 @@ for i in range(len(station_name)):
 #Remove double loc on grid
 dict_exch = {tuple(v): k for k, v in station_rot_dict.items()}
 station_rot_dict2 = {v: list(k) for k, v in dict_exch.items()}
+pdx.saveRotStationDict(station_rot_dict2)
 
 #Get grid size
 x_grid_max = np.max(np.asarray(list(station_rot_dict2.values()))[:, 0])

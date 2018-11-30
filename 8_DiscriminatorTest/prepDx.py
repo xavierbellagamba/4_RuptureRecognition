@@ -88,6 +88,43 @@ def loadVirtStationDict(file_path, reverse=False):
 	return station_dict
 
 
+#####################################################################################
+# saveRotStationDict: save station dictionary as csv
+#####################################################################################
+def saveRotStationDict(station):
+	file_str = ''
+	key = list(station.keys())
+
+	#Create station file
+	for i in range(len(station)):
+		file_str = file_str + key[i] + ',' + str(station[key[i]][0]) + ',' + str(station[key[i]][1])
+		if i != len(station)-1:
+			file_str = file_str + '\n'
+
+	#Export file
+	file_path = './rot_station_dict.csv'
+	with open(file_path, "w") as output_file:
+		print(file_str, file=output_file)
+	output_file.close()
+
+
+#####################################################################################
+# loadVirtStationDict: load station dictionary
+#####################################################################################
+def loadRotStationDict(file_path, reverse=False):
+	#Load data
+	raw_data = loadGM_CS(file_path)
+
+	#Create dict
+	station_dict = {}
+	for i in range(len(raw_data)):
+		station_dict.update({raw_data[i][0] : [int(raw_data[i][1]), int(raw_data[i][2])]})
+
+	if reverse:
+		station_dict = {v: k for k, v in station_dict.items()}
+
+	return station_dict
+
 
 
 

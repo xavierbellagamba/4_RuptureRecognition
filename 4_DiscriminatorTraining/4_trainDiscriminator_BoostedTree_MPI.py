@@ -38,7 +38,7 @@ N_estimator = [300]
 model_name = 'discriminator.mdl'
 
 #Tested features max
-learning_rate = [0.1, 0.05, 0.01, 0.05, 0.001]
+learning_rate = [0.1, 0.05, 0.01, 0.005, 0.001]
 ###########################################
 
 
@@ -225,11 +225,10 @@ if rank == rootRank:
     ax.set_xlabel('Learning rate')
     ax.set_ylabel('Cross-validation error (inaccuracy)')
     plt.savefig(dir_path + 'CV_BT_' + str(i_lr) + '.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
-
+    '''
     #Save the model
     model_path = dir_path + model_name
     pickle.dump(bestModel, open(model_path, 'wb'))
-    '''
 
 
 #######################################################

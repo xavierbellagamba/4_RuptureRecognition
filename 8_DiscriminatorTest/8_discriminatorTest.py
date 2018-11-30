@@ -25,10 +25,10 @@ model_name = 'RF_discriminator.mdl'
 IM_name = ['AI']
 
 #Dropout rate
-drop_rate = [0.025]#, 0.05, 0.075, 0.1, 0.125]
+drop_rate = [0.025, 0.05, 0.075, 0.1, 0.125]
 
 #Number of tests per rupture
-n = 1
+n = 10
 ###########################################
 
 #Import data
