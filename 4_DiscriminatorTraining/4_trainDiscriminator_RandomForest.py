@@ -34,7 +34,7 @@ f_max = ['sqrt']
 f_str = ['$\sqrt{N}$']
 
 #Number of processes
-N_proc = 12
+N_proc = 15
 ###########################################
 
 #Import data

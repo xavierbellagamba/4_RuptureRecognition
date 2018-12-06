@@ -15,16 +15,19 @@ import GMdataImportFx as gix
 # User-defined parameters
 ###########################################
 #GM data
-data_name = 'HopeConwayOS_HYP11-36_S1344'
+data_name = 'Darfield'#'AlpineF2K_HYP01-47_S1244'
 
 #Generator model name
-gen_model_name = 'generator'
+gen_model_name = 'Generator_RFEncod'
 
 #Discriminator model name
 discr_model_name = 'RF_discriminator'
 
 #Save as shapefile
-saveSHP = True
+saveSHP = False
+
+#Save plots
+savePlot = True
 ###########################################
 
 #Create result folder
@@ -48,11 +51,11 @@ discriminator_GM = pickle.load(rf_load)
 
 #Load generator
 print('Load generator...')
-json_file = open('./Generator/' + gen_model_name + '.json', 'r')
+json_file = open('./Generator/' + gen_model_name + '/generator.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 generator_GM = model_from_json(loaded_model_json)
-generator_GM.load_weights('./Generator/' + gen_model_name + ".hdf5")
+generator_GM.load_weights('./Generator/' + gen_model_name + "/generator.hdf5")
 
 #Evaluate results
-fu.comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP)
+fu.comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP, savePlot)

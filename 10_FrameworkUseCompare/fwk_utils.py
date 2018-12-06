@@ -13,6 +13,101 @@ import discr_utils as du
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
+import rasterio as rio
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib import rc
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+def cm2inch(value):
+    return value/2.54
+
+#####################################################################################
+# saveResultSHP : save one result (1 IM) as a GM map in pdf
+#####################################################################################
+def saveResultPlot(GM_raster, str_file, IM_name, NZI, ext):
+	#Plot label
+	str_lbl = {}
+	str_lbl['PGA'] = 'PGA [$g$]'
+	str_lbl['PGV'] = 'PGV [$cm/s$]'
+	str_lbl['PSA_0.5'] = 'pSA(0.5s) [$g$]'
+	str_lbl['pSA_1.0'] = 'pSA(1.0s) [$g$]'
+	str_lbl['pSA_3.0'] = 'pSA(3.0s) [$g$]'
+	str_lbl['AI'] = 'Aria''s intensity [$m^{2}/s^{3}$]'
+
+	#Create boundary dict
+	b_dict = {}
+	vmin = 0.0
+	alpha_b = 0.2
+	if 'res' in str_file.split('_')[-1]:
+		b_dict['PGA'] = [-1., 1.]
+		b_dict['PGV'] = [-1., 1.]
+		b_dict['PSA_0.5'] = [-1., 1.]
+		b_dict['pSA_1.0'] = [-1., 1.]
+		b_dict['pSA_3.0'] = [-1., 1.]
+		b_dict['AI'] = [-1., 1.]
+		vmin = -1.0
+		alpha_b = 0.4
+	else: 
+		b_dict['PGA'] = [0.025, 1.25]
+		b_dict['PGV'] = [2.5, 80.]
+		b_dict['PSA_0.5'] = [0.05, 2.]
+		b_dict['pSA_1.0'] = [0.01, 1.25]
+		b_dict['pSA_3.0'] = [0.005, 0.3]
+		b_dict['AI'] = [2.5, 200.]
+	
+	#Select cmap
+	cmap = []
+	if 'res' in str_file.split('_')[-1]:
+		cmap = plt.cm.get_cmap('seismic')
+	else:
+		cmap = plt.cm.get_cmap('hot_r')
+
+	#Readapt numbers in the GM raster
+	for i in range(GM_raster.shape[0]):
+		if GM_raster[i][2] > b_dict[IM_name][1]:
+			GM_raster[i][2] = b_dict[IM_name][1]
+
+	#Remove too low values
+	if 'res' in str_file.split('_')[-1]:
+		for i in range(GM_raster.shape[0]):
+			if GM_raster[i][2] < b_dict[IM_name][0]:
+				GM_raster[i][2] = b_dict[IM_name][0]
+	else:
+		GM_raster = GM_raster[np.where(GM_raster[:, 2] > b_dict[IM_name][0])]
+
+	#Plot
+	cmap_NZI = plt.cm.get_cmap('Greys_r')
+
+	rc('text', usetex=True)
+	rc('font', family='serif')
+
+	im = plt.scatter(GM_raster[:, 0], GM_raster[:, 1], c=GM_raster[:, 2], cmap=cmap, vmin=vmin, vmax=b_dict[IM_name][1])
+
+	fig, ax = plt.subplots()
+	fig.set_size_inches(cm2inch(10), cm2inch(14))
+	ax.imshow(NZI, extent=ext, zorder=1, cmap=cmap_NZI)
+	#ax.scatter(GM_raster[:, 0], GM_raster[:, 1], c=GM_raster[:, 2], s=36, marker=(4, 0, 20), cmap=cmap, alpha=0.6, zorder=2, vmin=vmin, vmax=b_dict[IM_name][1], edgecolors=None, linewidths=0.0)
+	if not 'res' in str_file.split('_')[-1]:
+		ax.scatter(GM_raster[:, 0], GM_raster[:, 1], c=GM_raster[:, 2], s=144, marker=(4, 0, 20), cmap=cmap, alpha=0.1, zorder=2, vmin=vmin, vmax=b_dict[IM_name][1], edgecolors=None, linewidths=0.0)
+	ax.scatter(GM_raster[:, 0], GM_raster[:, 1], c=GM_raster[:, 2], s=36, marker=(4, 0, 20), cmap=cmap, alpha=0.2, zorder=2, vmin=vmin, vmax=b_dict[IM_name][1], edgecolors=None, linewidths=0.0)
+	#ax.scatter(GM_raster[:, 0], GM_raster[:, 1], c=GM_raster[:, 2], cmap=cmap, alpha=0.5, zorder=2, vmin=vmin, vmax=b_dict[IM_name][1], edgecolors=None, linewidths=0.0)
+	plt.xlim([ext[0], ext[1]])
+	plt.ylim([ext[2], ext[3]])
+	plt.xticks([1205923., 1600000., 1994077.])
+	ax.set_xticklabels(['168.0$^\circ$E', '173.0$^\circ$E', '178.0$^\circ$E'])
+	plt.yticks([5004874., 5560252., 6115515.])
+	ax.set_yticklabels(['45.0$^\circ$S', '40.0$^\circ$S', '35.0$^\circ$S'])
+	divider = make_axes_locatable(ax)
+	cax = divider.append_axes('bottom', size='3%', pad=0.35)
+	cb = plt.colorbar(im, orientation='horizontal', cax=cax, ticks=np.arange(vmin, b_dict[IM_name][1]+0.00001, b_dict[IM_name][1]/5.))
+	cb.ax.set_xlabel(str_lbl[IM_name])
+	plt.tight_layout()
+	plt.savefig(str_file, dpi=600)
+	plt.close('all')
+
+
 
 #####################################################################################
 # saveResultSHP : save one result (1 IM) as a shp file - NZTM2000
@@ -89,7 +184,7 @@ def saveDiscriminatorResults(P_rupture, P_fault, rupture_dict, fault_dict, data_
 #####################################################################################
 # saveGeneratorResults : save the GM maps
 #####################################################################################
-def saveGeneratorResults(GM_map, data_name, IM_name, saveSHP):
+def saveGeneratorResults(GM_map, data_name, IM_name, saveSHP, savePlot):
 	s = GM_map.shape
 
 	translation = [1200000., 4570000.]
@@ -101,6 +196,22 @@ def saveGeneratorResults(GM_map, data_name, IM_name, saveSHP):
 		dir_path = './gen/' + data_name + '/shp/'
 		if not os.path.exists(dir_path):
 			os.mkdir(dir_path)
+
+	ext = []
+	NZI = []
+	if savePlot:
+		#Create result folder
+		dir_path = './gen/' + data_name + '/plot/'
+		if not os.path.exists(dir_path):
+			os.mkdir(dir_path)
+
+		#Load the raster and rescale it
+		NZI = './NZI/NZI.tif'
+		raster = rio.open(NZI)
+		trf = raster.transform
+		NZI = raster.read()
+		ext = [trf[0]-50, trf[0]+50+NZI.shape[2]*100, trf[3]-50-NZI.shape[1]*100, trf[3]+50]
+		NZI = NZI[0]
 
 	grid_loc = []
 	for i in range(s[0]):
@@ -127,11 +238,15 @@ def saveGeneratorResults(GM_map, data_name, IM_name, saveSHP):
 			str_file = './gen/' + data_name + '/shp/' + IM_name[i][0] + '_pred.shp'
 			saveResultSHP(np.array(GM_raster), str_file)
 
+		if savePlot:
+			str_file = './gen/' + data_name + '/plot/' + IM_name[i][0] + '_pred.pdf'
+			saveResultPlot(np.array(GM_raster), str_file, IM_name[i][0], NZI, ext)
+
 
 #####################################################################################
 #evaluateEvent: evaluate the event and produce GM map
 #####################################################################################
-def evaluateEvent(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP):
+def evaluateEvent(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP, savePlot):
 	#Create result folder
 	dir_path = './gen/' + data_name
 	if not os.path.exists(dir_path):
@@ -164,13 +279,13 @@ def evaluateEvent(data_name, realID, discriminator_GM, generator_GM, fault_dict,
 
 	#Export generator results
 	print('Save generator results...')
-	saveGeneratorResults(GM_pred[0], data_name, IM_name, saveSHP)
+	saveGeneratorResults(GM_pred[0], data_name, IM_name, saveSHP, savePlot)
 
 
 #####################################################################################
 # saveGeneratorResultsComparison : save the GM maps
 #####################################################################################
-def saveGeneratorResultsComparison(GM_map, GM_obs, data_name, IM_name, saveSHP):
+def saveGeneratorResultsComparison(GM_map, GM_obs, data_name, IM_name, saveSHP, savePlot):
 	s = GM_map.shape
 
 	translation = [1200000., 4570000.]
@@ -182,6 +297,26 @@ def saveGeneratorResultsComparison(GM_map, GM_obs, data_name, IM_name, saveSHP):
 		dir_path = './gen/' + data_name + '/shp/'
 		if not os.path.exists(dir_path):
 			os.mkdir(dir_path)
+
+	ext = []
+	NZI = []
+	if savePlot:
+		#Create result folder
+		dir_path = './gen/' + data_name + '/plot/'
+		if not os.path.exists(dir_path):
+			os.mkdir(dir_path)
+
+		#Load the raster and rescale it
+		NZI = './NZI/NZI.tif'
+		raster = rio.open(NZI)
+		trf = raster.transform
+		NZI = raster.read()
+		ext = [trf[0]-50, trf[0]+50+NZI.shape[2]*100, trf[3]-50-NZI.shape[1]*100, trf[3]+50]
+		NZI = NZI[0]
+	else:
+		ext = None
+		NZI = None
+
 
 	grid_loc = []
 	for i in range(s[0]):
@@ -208,6 +343,10 @@ def saveGeneratorResultsComparison(GM_map, GM_obs, data_name, IM_name, saveSHP):
 			str_file = './gen/' + data_name + '/shp/' + IM_name[i][0] + '_pred.shp'
 			saveResultSHP(np.array(GM_raster), str_file)
 
+		if savePlot:
+			str_file = './gen/' + data_name + '/plot/' + IM_name[i][0] + '_pred.pdf'
+			saveResultPlot(np.array(GM_raster), str_file, IM_name[i][0], NZI, ext)
+
 	for i in range(s[2]):
 		GM_raster = []
 
@@ -221,8 +360,12 @@ def saveGeneratorResultsComparison(GM_map, GM_obs, data_name, IM_name, saveSHP):
 		f.close()
 
 		if saveSHP:
-			str_file = './gen/' + data_name + '/shp/' + IM_name[i][0] + '_pred.shp'
+			str_file = './gen/' + data_name + '/shp/' + IM_name[i][0] + '_obs.shp'
 			saveResultSHP(np.array(GM_raster), str_file)
+
+		if savePlot:
+			str_file = './gen/' + data_name + '/plot/' + IM_name[i][0] + '_obs.pdf'
+			saveResultPlot(np.array(GM_raster), str_file, IM_name[i][0], NZI, ext)
 
 	for i in range(s[2]):
 		GM_raster = []
@@ -237,8 +380,12 @@ def saveGeneratorResultsComparison(GM_map, GM_obs, data_name, IM_name, saveSHP):
 		f.close()
 
 		if saveSHP:
-			str_file = './gen/' + data_name + '/shp/' + IM_name[i][0] + '_pred.shp'
+			str_file = './gen/' + data_name + '/shp/' + IM_name[i][0] + '_res.shp'
 			saveResultSHP(np.array(GM_raster), str_file)
+
+		if savePlot:
+			str_file = './gen/' + data_name + '/plot/' + IM_name[i][0] + '_res.pdf'
+			saveResultPlot(np.array(GM_raster), str_file, IM_name[i][0], NZI, ext)
 
 
 #####################################################################################
@@ -294,7 +441,7 @@ def loadSingleGmMap(rupt_name):
 #####################################################################################
 #evaluateEvent: evaluate the event and produce GM map
 #####################################################################################
-def comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP):
+def comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP, savePlot):
 	#Create result folder
 	dir_path = './gen/' + data_name
 	if not os.path.exists(dir_path):
@@ -330,7 +477,7 @@ def comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_d
 
 	#Export generator results
 	print('Save generator results...')
-	saveGeneratorResultsComparison(GM_pred[0], GM_obs, data_name, IM_name, saveSHP)
+	saveGeneratorResultsComparison(GM_pred[0], GM_obs, data_name, IM_name, saveSHP, savePlot)
 
 
 

@@ -43,6 +43,7 @@ IM_ID = [int(IM_dict[x]) for x in IM_name]
 IM_ID_norm = [x/len(IM_ID) for x in IM_ID]
 cm_IM = cm.get_cmap('tab10')
 IM_col = cm_IM([IM_ID_norm])
+IM_name = ['PGA', 'PGV', 'AI', 'pSA(0.1s)', 'pSA(1.0s)', 'pSA(3.0s)' ]
 #%%
 rc('text', usetex=True)
 rc('font', family='serif', size=13)

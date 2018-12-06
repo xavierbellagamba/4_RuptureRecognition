@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 import GMCluster as gml
 import discr_utils as du
 from matplotlib import cm
@@ -14,7 +15,7 @@ import prepDx as pdx
 # User-defined parameters
 ###########################################
 #Model name
-model_name = 'RF_discriminator.mdl'
+model_name = 'BT_discriminator.mdl'
 
 #IM used by the discriminator
 IM_name = 'AI'

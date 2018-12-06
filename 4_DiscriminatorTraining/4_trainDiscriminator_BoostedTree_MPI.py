@@ -32,13 +32,13 @@ IM_name = ['PGA', 'PGV', 'AI', 'pSA_0.1', 'pSA_1.0', 'pSA_3.0']
 K = 5
 
 #Number of trees
-N_estimator = [300]
+N_estimator = [2000]
 
 #Model name
 model_name = 'discriminator.mdl'
 
 #Tested features max
-learning_rate = [0.1, 0.05, 0.01, 0.005, 0.001]
+learning_rate = [0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001]
 ###########################################
 
 
@@ -173,7 +173,7 @@ if rank == rootRank:
     X_test = X_test[:, :, int(IM_dict[IM_best])]
     
     #Create and fit the model
-    bestModel = GradientBoostingClassifier(learning_rate=lr_best, n_estimators=N_best, min_samples_split=2, max_depth=3, max_features=2, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
+    bestModel = GradientBoostingClassifier(learning_rate=lr_best, n_estimators=N_best, min_samples_split=4, subsample=0.5, min_samples_leaf=2, max_depth=4, max_features=42, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
     bestModel = bestModel.fit(X, y)
         
     #Test on validation set
@@ -245,7 +245,7 @@ else:
         X_train, y_train, X_val, y_val = du.createTrainValDataset(X, y, ind_K, job_i[3], IM_ID[job_i[1]])
 
         #Create and fit the model
-        BT = GradientBoostingClassifier(learning_rate=learning_rate[job_i[0]], n_estimators=N_estimator[job_i[2]], min_samples_split=2, max_depth=3, max_features=2, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
+        BT = GradientBoostingClassifier(learning_rate=learning_rate[job_i[0]], n_estimators=N_estimator[job_i[2]], min_samples_split=4, min_samples_leaf=2, subsample=0.5, max_depth=4, max_features=42, verbose=0, validation_fraction=0.1, n_iter_no_change=5)
         BT = BT.fit(X_train, y_train)
         
         #Test on validation set

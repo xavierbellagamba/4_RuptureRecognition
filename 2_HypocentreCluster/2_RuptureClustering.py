@@ -69,8 +69,8 @@ for i in range(len(fault)):
             #Compute the silhouette score of K
             silhouette_avg.append(silhouette_score(IM_cl, GM_newLabel))
         
-        #Pick the K such that the silhouette score is the lowest
-        K_pick = K[np.argmin(silhouette_avg)]
+        #Pick the K such that the silhouette score is the highest
+        K_pick = K[np.argmax(silhouette_avg)]
         
         #Get final labels
         dict_fault, station_clust, station_ID = gcl.getFinalGMLabel(K_pick, station_coord, IM, IM_ID, GM_lbl, N_min)

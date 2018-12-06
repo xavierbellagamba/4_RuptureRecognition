@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 import GMCluster as gml
 import discr_utils as du
 from matplotlib import cm
@@ -19,7 +20,7 @@ def cm2inch(value):
 # User-defined parameters
 ###########################################
 #Model name
-model_name = 'RF_discriminator.mdl'
+model_name = 'BT_discriminator.mdl'
 
 #IM used by the discriminator
 IM_name = ['AI']
@@ -105,7 +106,7 @@ rc('text', usetex=True)
 rc('font', family='serif')
 #Plot results dropout dropout
 fig, ax = plt.subplots()
-fig.set_size_inches(cm2inch(18), cm2inch(10))
+fig.set_size_inches(cm2inch(18), cm2inch(9))
 
 ax.scatter(drop_rate, acc_dropout_mu, s=50, marker='D', color='black', label='\mu', zorder=10)
 ax.plot(drop_rate, p_dropout_mu, markersize=10, marker='o', color='black', fillstyle='none', linestyle='none', mew=2, label='\mu', zorder=10)
@@ -132,7 +133,7 @@ for i in range(len(drop_rate)):
     iax.append(plt.axes([0, 0, i, 1]))
     ip.append(InsetPosition(ax, [0.055+0.16*(i+1), 0, 0.08, 1.0])) #posx, posy, width, height
     iax[i].set_axes_locator(ip[i])
-    p, x = np.histogram(p_rupt[i], bins=np.arange(-0.05, 1.06, 0.1)) 
+    p, x = np.histogram(p_rupt[i], bins=np.arange(-0.05, 1.06, 0.05)) 
     x = x[:-1] + (x[1] - x[0])/2
     f = UnivariateSpline(x, np.asfarray(p), s=100)
     iax[i].plot(f(x), x, color='black', zorder=10)
@@ -141,14 +142,16 @@ for i in range(len(drop_rate)):
     iax[i].fill_betweenx(x, f(x), 0, alpha=0.3, color='black')
     iax[i].axis('off')
 
-ax.set_xlabel('Dropout rate')
-ax.set_ylabel('Accuracy \& Assigned probability')
+ax.set_xlabel('Dropout rate', fontsize=14)
+ax.set_ylabel('Accuracy \& Assigned probability', fontsize=14)
 ax.set_ylim([0, 1])
 ax.set_xlim([-0.005, 0.15])
 ax.set_xticks([0.0, 0.025, 0.05, 0.075, 0.1, 0.125])
+ax.set_xticklabels(['0.0\%', '2.5\%', '5.0\%', '7.5\%', '10.0\%', '12.5\%'])
+ax.tick_params('both', labelsize=14)
 ax.grid()
 ax.set_axisbelow(True)
-#plt.tight_layout()
+plt.tight_layout()
 plt.savefig('rupture_Test.pdf', dpi=600)
 
 
