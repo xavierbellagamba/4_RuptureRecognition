@@ -34,7 +34,7 @@ def saveResultPlot(GM_raster, str_file, IM_name, NZI, ext):
 	str_lbl['PSA_0.5'] = 'pSA(0.5s) [$g$]'
 	str_lbl['pSA_1.0'] = 'pSA(1.0s) [$g$]'
 	str_lbl['pSA_3.0'] = 'pSA(3.0s) [$g$]'
-	str_lbl['AI'] = 'Aria''s intensity [$m^{2}/s^{3}$]'
+	str_lbl['AI'] = 'Arias [$m^{2}/s^{3}$]'
 
 	#Create boundary dict
 	b_dict = {}
@@ -49,6 +49,12 @@ def saveResultPlot(GM_raster, str_file, IM_name, NZI, ext):
 		b_dict['AI'] = [-1., 1.]
 		vmin = -1.0
 		alpha_b = 0.4
+		str_lbl['PGA'] = 'ln(PGA$_Generated$/PGA$_Cybershake$)'
+		str_lbl['PGV'] = 'ln(PGV$_Generated$/PGV$_Cybershake$)'
+		str_lbl['PSA_0.5'] = 'ln(pSA(0.5s)$_Generated$/pSA(0.5s)$_Cybershake$)'
+		str_lbl['pSA_1.0'] = 'ln(pSA(1.0s)$_Generated$/pSA(1.0s)$_Cybershake$)'
+		str_lbl['pSA_3.0'] = 'ln(pSA(3.0s)$_Generated$/pSA(3.0s)$_Cybershake$)'
+		str_lbl['AI'] = 'ln(Arias$_Generated$/Arias$_Cybershake$)'
 	else: 
 		b_dict['PGA'] = [0.025, 1.25]
 		b_dict['PGV'] = [2.5, 80.]
