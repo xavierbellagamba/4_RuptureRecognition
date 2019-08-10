@@ -15,13 +15,13 @@ import GMdataImportFx as gix
 # User-defined parameters
 ###########################################
 #GM data
-data_name = 'Darfield'#'AlpineF2K_HYP01-47_S1244'
+data_name = 'Seddon'#'Kaikoura_init'#'AwatNEVer_HYP28-36_S1514'#'AlpineF2K_HYP10-47_S1334'#'Kaikoura'#'AlpineF2K_HYP44-47_S1674'#'AlpineF2K_HYP22-47_S1454'#'AlpineF2K_HYP01-47_S1244'#'Manaota_HYP08-35_S1314'#
 
 #Generator model name
-gen_model_name = 'Generator_RFEncod'
+gen_model_name = 'Generator_BTEncod'
 
 #Discriminator model name
-discr_model_name = 'RF_discriminator'
+discr_model_name = 'BT_discriminator'
 
 #Save as shapefile
 saveSHP = False
@@ -44,6 +44,9 @@ IM_name = gix.loadCSV('./selectedIM.csv')
 fault_dict = du.loadFaultDict('./fault_dict.csv')
 rupture_dict = du.loadRuptureDict('./rupture_dict.csv')
 
+#GM = fu.loadSingleGmMap('./data/generator/Kaikoura.csv')
+
+
 #Load discriminator
 print('Load discriminator...')
 rf_load = open('./Discriminator/' + discr_model_name + '.mdl', 'rb')
@@ -58,4 +61,6 @@ generator_GM = model_from_json(loaded_model_json)
 generator_GM.load_weights('./Generator/' + gen_model_name + "/generator.hdf5")
 
 #Evaluate results
-fu.comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP, savePlot)
+#fu.comparePredictObs(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP, savePlot)
+fu.comparePredictObsComplex(data_name, realID, discriminator_GM, generator_GM, fault_dict, rupture_dict, IM_name, saveSHP, savePlot)
+

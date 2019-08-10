@@ -59,7 +59,38 @@ ax.grid()
 ax.set_axisbelow(True)
 ax.set_xscale('log')
 ax.set_xlim([max(learning_rate), min(learning_rate)])
-lgd = ax.legend(bbox_to_anchor=(1.02, 1), loc=2, ncol=1, borderaxespad=0., fontsize=11)
+#lgd = ax.legend(bbox_to_anchor=(1.02, 1), loc=2, ncol=1, borderaxespad=0., fontsize=11)
+ax.legend(loc=1, ncol=1, fontsize=11)
+
 ax.set_xlabel('Learning rate')
 ax.set_ylabel('Cross-validation error (inaccuracy)')
-plt.savefig(dir_path + 'CV_BT_' + '.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
+plt.tight_layout()
+#plt.savefig(dir_path + 'CV_BT' + '.pdf', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight')
+plt.savefig(dir_path + 'CV_BT' + '.pdf', dpi=600)
+plt.close()
+
+#Load model
+BT = pickle.load(open(dir_path + 'discriminator.mdl', 'rb'))
+l = BT.train_score_
+#%%
+lr_t = lr_best
+d = 0
+while lr_t < 1:
+    d = d+1
+    lr_t = lr_t * 10.
+str_lr = str(int(lr_t)) + ' \cdot 10^{-' + str(int(d)) + '}'
+#%%
+fig, ax = plt.subplots()
+fig.set_size_inches(cm2inch(9), cm2inch(11))
+ax.plot(np.arange(len(l)), l, c='black')
+ax.set_xlim([0, len(l)])
+ax.set_ylim([10, 10000])
+ax.set_xlabel('Iterations')
+ax.set_ylabel('Loss (cross-entropy)')
+t = ax.text(0.4*len(l), 0.55*max(l), ' Learning rate: ' + str_lr + '\n Selected IM: ' + str(IM_best), fontsize=10)
+t.set_bbox(dict(facecolor='white', alpha=0.7, edgecolor='grey'))
+ax.grid()
+ax.set_yscale('log')
+ax.set_axisbelow(True)
+plt.tight_layout()
+plt.savefig(dir_path + 'CV_BT_training' + '.pdf', dpi=600)

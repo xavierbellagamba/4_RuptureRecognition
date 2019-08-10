@@ -38,9 +38,11 @@ for i in range(len(station_name)):
     station_rot_dict[station_name[i]] = [int(data[i][0]/cell_size), int(data[i][1]/cell_size)]
 
 #Remove double loc on grid
+#pdx.saveRotStationDict(station_rot_dict)
 dict_exch = {tuple(v): k for k, v in station_rot_dict.items()}
 station_rot_dict2 = {v: list(k) for k, v in dict_exch.items()}
 pdx.saveRotStationDict(station_rot_dict2)
+
 
 #Get grid size
 x_grid_max = np.max(np.asarray(list(station_rot_dict2.values()))[:, 0])
@@ -112,6 +114,5 @@ np.save(dir_path + 'X_name_test.npy', np.asarray(GM_name)[ind_test])
 np.save(dir_path + 'X_train.npy', GM[ind_train])
 np.save(dir_path + 'y_train.npy', np.asarray(GM_lbl)[ind_train])
 np.save(dir_path + 'X_name_train.npy', np.asarray(GM_name)[ind_train])
-
 
 

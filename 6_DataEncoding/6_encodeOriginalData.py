@@ -22,7 +22,7 @@ IM_name = 'AI'
 ###########################################
 
 #Load generator data name
-GM_name = np.load('./data/generator/X_name_train.npy')
+GM_name = np.load('./data/generator/X_name_test.npy')
 
 #Load dictionary of real stations
 realID = gml.loadRealStationID('./realStationID.csv')

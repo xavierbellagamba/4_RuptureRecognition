@@ -1,0 +1,4 @@
+From the proba vecor and the dictionary, 
+Plot fault with cmap plasma
+colorbar: P_min=0 P_max=P_max(rupture) (round 0.05)
+color from colormap: 0 -> 
